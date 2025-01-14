@@ -274,6 +274,7 @@
                       buttonType: 'subscribe',
                       buttonSizeMode: 'fill',
                       onClick: () => {
+                        $('#error-content').hide()
                         paymentsClient.loadPaymentData(isReadyToPayRequest)
                           .then(function(paymentData) {
                             // handle the response
@@ -291,21 +292,20 @@
                           });
                       },
                       allowedPaymentMethods: [cardPaymentMethod]}); // same payment methods as for the loadPaymentData() API call
-                  console.log('gpay init ')
                   document.getElementById('gpay-container').appendChild(button);
                 }
               })
-              .catch(function(err) {
+              .catch( function(jqXHR, status) {
                 if(showGPay){
                 // show error in developer console for debugging
-                  console.error(err);
-                  $("#payment-form").hide();
-                  $("#expired-session-container").hide();
-                  console.log('success-show')
-                  $("#payment-success").show();
+                  var err = jqXHR.responseJSON.message;
+                  if(err.includes('Please contact the issuing bank.')){
+                    err = 'Use Credit Card/PayPal (debit cards may be refused by your bank)';
+                  }
+                  $('#error-content').text(err);
+                  fetchNewTokenAndReload(err);
+                  loadingDiv.style.visibility = 'hidden';
                   $('#loading-body').hide();
-                  $('#error-body').hide();
-                  $('#error-body-from-url').hide();
                   $('#update-payment-form').hide();
                 }
               });
@@ -740,6 +740,8 @@
     var request;
 
     function applePayClicked() {
+      $('#error-body').hide();
+      $('#error-body-from-url').hide();
       var session = new ApplePaySession(2, request);
       session.onvalidatemerchant = function(event) {
         var validationURL = event.validationURL;
