@@ -387,6 +387,8 @@
         },
         onClick: function(data, actions) {
           $("#click-paypal-button").click()
+          $("#error-body").hide();
+          $("#error-body-from-url").hide();
         },
         onApprove: function (data, actions) {
           console.log('You have successfully created subscription ' + data.subscriptionID); // Optional message given to subscriber
@@ -600,6 +602,8 @@
     /* Calling bluesnap.submitCredentials: function that submits card data to
     BlueSnap and calls input function with card data object if submission was successful */
     function do_when_clicking_submit_button() {
+      $("#error-body-from-url").hide();
+      $("#error-body").hide();
       if(subId){
         bluesnap.hostedPaymentFieldsSubmitData(
           function(callback) {
