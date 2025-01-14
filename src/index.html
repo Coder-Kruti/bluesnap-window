@@ -755,6 +755,7 @@
 
       session.onpaymentauthorized = function(event) {
         var paymentToken = event.payment;
+        console.log(paymentToken)
         processApplePayment(paymentToken, session);
       };
 
