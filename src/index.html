@@ -145,6 +145,13 @@
           $("#payment-success").hide();
           $('#loading-body').hide();
           $('#error-body').show();
+          var err = jqXHR.responseJSON.message;
+          if(err.includes('Please contact the issuing bank.')){
+            err = 'Use Credit Card/PayPal (debit cards may be refused by your bank)';
+          }
+
+          $('#error-content').text(err);
+          fetchNewTokenAndReload(err);
           $('#update-payment-form').hide();
         }
       });
@@ -188,6 +195,13 @@
           $("#payment-success").hide();
           $('#loading-body').hide();
           $('#error-body').show();
+          var err = jqXHR.responseJSON.message;
+          if(err.includes('Please contact the issuing bank.')){
+            err = 'Use Credit Card/PayPal (debit cards may be refused by your bank)';
+          }
+
+          $('#error-content').text(err);
+          fetchNewTokenAndReload(err);
           $('#update-payment-form').hide();
         }
       });
@@ -617,7 +631,13 @@
                 error: function (jqXHR, status) {
                   console.log(jqXHR)
                   $('#error-body').show();
-                  $('#error-content').text('Something went wrong in update payment source');
+                  var err = jqXHR.responseJSON.message;
+                  if(err.includes('Please contact the issuing bank.')){
+                    err = 'Use Credit Card/PayPal (debit cards may be refused by your bank)';
+                  }
+
+                  $('#error-content').text(err);
+                  fetchNewTokenAndReload(err);
                   $('#loading-body').hide();
                 }
               });
@@ -720,12 +740,7 @@
     var request;
 
     function applePayClicked() {
-      console.log('apple pay clicked')
       var session = new ApplePaySession(2, request);
-
-      console.log('setup on valid merchant')
-      console.log(request)
-
       session.onvalidatemerchant = function(event) {
         var validationURL = event.validationURL;
         console.log('validation url ' + validationURL);
@@ -752,14 +767,12 @@
             console.error('Error fetching new token:', error);
           });
       };
-
       session.onpaymentauthorized = function(event) {
         var paymentToken = event.payment;
         console.log(paymentToken)
 
         processApplePayment(btoa(JSON.stringify(paymentToken)), session);
       };
-
       session.begin()
     }
 
